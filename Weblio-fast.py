@@ -64,7 +64,7 @@ class Weblio(WebService):
     def __init__(self):
         super(Weblio, self).__init__()
     def _get_from_api(self):
-        filewordpath=WeblioSearch(self.quote_word)
+        filewordpath=WeblioSearch(self.word)
         with open(filewordpath, 'r') as f:
             fileword= json.loads(f.read())
         for kana in fileword.keys():
@@ -92,8 +92,11 @@ class Weblio(WebService):
         result={
             'kana_all':kana_all,
             'kana_first':kana_first,
-            'SsdSml':SsdSml,
+            'SsdSml':SsdSml_str,
         }
+        a=open(filewordpath+u'.txt','w',encoding='utf-8')
+        a.write(kana_all+'\n'+SsdSml_str)
+        a.close()
         return self.cache_this(result)
     
     @export('释义')
@@ -101,14 +104,9 @@ class Weblio(WebService):
         return self._get_field('kana_first')
 
     @export('完整释义')
-    def mean_(self):
+    def mean_all(self):
         return self._get_field('kana_all')
 
     @export('相似意思')
     def SsdSml_(self):
         return self._get_field('SsdSml')
-
-
-
-
-
