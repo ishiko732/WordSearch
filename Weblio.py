@@ -4,17 +4,20 @@ import re
 import json
 
 def WeblioSearch(word,path=u'E:\object\weblio\json'):
-    url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
-    get_requests=requests.get(url)
-    content=get_requests.content
-    soup=bs4(content,'html.parser').find('div',attrs={'id':'main'})
-
-
-    flag=False
-    for dictja in soup.find_all('h2',attrs={'class':'ttl'}):
-        if dictja.text.replace(' ','') == r"三省堂大辞林第三版":
-            flag=True
-    if flag==False:
+    try:
+        url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
+        get_requests=requests.get(url,timeout=5)#设置超时
+        content=get_requests.content
+        soup=bs4(content,'html.parser').find('div',attrs={'id':'main'})
+        flag=False
+        for dictja in soup.find_all('h2',attrs={'class':'ttl'}):
+            if dictja.text.replace(' ','') == r"三省堂大辞林第三版":
+                flag=True
+        if flag==False:
+            print("見つからない")
+            import sys
+            sys.exit(0)
+    except:#修正502 bad网页状态
         print("見つからない")
         import sys
         sys.exit(0)
@@ -57,4 +60,4 @@ def WeblioSearch(word,path=u'E:\object\weblio\json'):
     #json
 
     #三省堂 大辞林 第三版
-WeblioSearch("一度")
+WeblioSearch("日本")

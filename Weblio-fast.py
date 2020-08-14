@@ -6,19 +6,23 @@ import json
 from ..base import *
 
 def WeblioSearch(word,path=u'E:\object\weblio\json'):
-    url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
-    get_requests=requests.get(url)
-    content=get_requests.content
-    soup=bs4(content,'html.parser').find('div',attrs={'id':'main'})
-
-    flag=False
-    for dictja in soup.find_all('h2',attrs={'class':'ttl'}):
-        if dictja.text.replace(' ','') == r"三省堂大辞林第三版":
-            flag=True
-    if flag==False:
+    try:
+        url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
+        get_requests=requests.get(url,timeout=5)#设置超时
+        content=get_requests.content
+        soup=bs4(content,'html.parser').find('div',attrs={'id':'main'})
+        flag=False
+        for dictja in soup.find_all('h2',attrs={'class':'ttl'}):
+            if dictja.text.replace(' ','') == r"三省堂大辞林第三版":
+                flag=True
+        if flag==False:
+            print("見つからない")
+            return ''
+            # import sys
+            # sys.exit(0)
+    except:#修正502 bad网页状态
         print("見つからない")
-        # import sys
-        # sys.exit(0)
+        return ''
 
     #三省堂 大辞林 第三版
     key=soup.find_all('div',attrs={'class':'NetDicHead'})#包含假名,音标,汉字
@@ -65,6 +69,13 @@ class Weblio(WebService):
         super(Weblio, self).__init__()
     def _get_from_api(self):
         filewordpath=WeblioSearch(self.word)
+        if filewordpath=='':
+            result={
+                'kana_all':u'',
+                'kana_first':u'',
+                'SsdSml':u'',
+            }
+            return self.cache_this(result)
         with open(filewordpath, 'r') as f:
             fileword= json.loads(f.read())
         for kana in fileword.keys():
@@ -94,9 +105,6 @@ class Weblio(WebService):
             'kana_first':kana_first,
             'SsdSml':SsdSml_str,
         }
-        a=open(filewordpath+u'.txt','w',encoding='utf-8')
-        a.write(kana_all+'\n'+SsdSml_str)
-        a.close()
         return self.cache_this(result)
     
     @export('释义')
