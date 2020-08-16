@@ -5,7 +5,7 @@ import json
 
 from ..base import *
 
-def WeblioSearch(word,path=u'E:\object\weblio\json'):
+def WeblioSearch(word):
     try:
         url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
         get_requests=requests.get(url,timeout=5)#设置超时
@@ -55,12 +55,8 @@ def WeblioSearch(word,path=u'E:\object\weblio\json'):
 
     #json
     jsObj = json.dumps(NetDict)
-    _file=path+"\\{word}.json".format(word=word)
-    fileObject = open(_file, 'w')
-    fileObject.write(jsObj)
-    fileObject.close()
     #json
-    return _file
+    return json.loads(jsObj)
     #三省堂 大辞林 第三版
 
 @register([u'Weblio-ja', u'Weblio-ja'])
@@ -68,16 +64,16 @@ class Weblio(WebService):
     def __init__(self):
         super(Weblio, self).__init__()
     def _get_from_api(self):
-        filewordpath=WeblioSearch(self.word)
-        if filewordpath=='':
+        fileword=WeblioSearch(self.word)
+        if fileword==dict():
             result={
                 'kana_all':u'',
                 'kana_first':u'',
                 'SsdSml':u'',
             }
             return self.cache_this(result)
-        with open(filewordpath, 'r') as f:
-            fileword= json.loads(f.read())
+        # with open(filewordpath, 'r') as f:
+        #     fileword= json.loads(f.read())
         for kana in fileword.keys():
             if kana=='SsdSml':
                 SsdSml=json.dumps(fileword['SsdSml'])

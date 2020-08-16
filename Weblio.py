@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs4
 import re
 import json
 
-def WeblioSearch(word,path=u'E:\object\weblio\json'):
+def WeblioSearch(word):
     try:
         url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
         get_requests=requests.get(url,timeout=5)#设置超时
@@ -53,11 +53,17 @@ def WeblioSearch(word,path=u'E:\object\weblio\json'):
 
     #json
     jsObj = json.dumps(NetDict)
-    _file=path+"\\{word}.json".format(word=word)
-    fileObject = open(_file, 'w')
-    fileObject.write(jsObj)
-    fileObject.close()
+    # _file=path+"\\{word}.json".format(word=word)
     #json
-
+    return json.loads(jsObj)
     #三省堂 大辞林 第三版
-WeblioSearch("日本")
+def wirte_word(worddict,word):
+    fileword=json.dumps(worddict)
+    _file="json\\{word}.json".format(word=word)
+    fileObject = open(_file, 'w')
+    fileObject.write(fileword)
+    fileObject.close()
+
+word=input("请输入要查询的单词")
+fileword=WeblioSearch(word)
+wirte_word(fileword,word)
