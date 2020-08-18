@@ -62,15 +62,22 @@ class Moji(WebService):#接口名称
         ans = r.json()['result']
         # wirte_word(ans,self.word)
         return self.cache_this(ans)
-    
+    # @with_styles(css='_moji.css', need_wrap_css=True, wrap_class='word-detail')
+    # def _css(self, val):
+    #     return val
     @export('单词释义[简]')
     def mean_simple(self):
         words=self._get_field('words')
         ret=''
         for word in words:
             if word['spell']==self.word:
+                '''<span class="detail-title" title="{0}">{0}</span>
+                    <p title="{1}">1. 一回，一次，一遍。{1}</p>'''
+                w=u'''<span class="detail-title" title="{pron}">{pron}</span>
+                    <p title="{excerpt}">1. 一回，一次，一遍。{excerpt}</p>'''.format(pron=word['pron'],excerpt=word['excerpt'])
                 w=u'{pron}:<br>{excerpt}<br>'.format(pron=word['pron'],excerpt=word['excerpt'])
                 ret+=w
+        # return self._css(ret)
         return ret
     @export('单词发音')
     def mean_audio(self):
