@@ -46,7 +46,7 @@ tts_data={#这个是单词的
 data['searchText'] = "一度"
 r = requests.post(target_search, data=json.dumps(data), headers=hd)  # POST请求
 ans = r.json()['result']
-search_result = ans['searchResults']
+# search_result = ans['searchResults']
 words = ans['words']
 
 for word in words:
