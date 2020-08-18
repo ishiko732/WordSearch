@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup as bs4
 import re
 import json
-target_search = 'https://api.mojidict.com/parse/functions/search_v3'
-target_fetch = 'https://api.mojidict.com/parse/functions/fetchWord_v2'
-target_tts = 'https://api.mojidict.com/parse/functions/fetchTts_v2'
+target_search = 'https://api.mojidict.com/parse/functions/search_v3' #查询单词ID
+target_fetch = 'https://api.mojidict.com/parse/functions/fetchWord_v2'#查询单词详细内容
+target_tts = 'https://api.mojidict.com/parse/functions/fetchTts_v2'#TTS
 
 
 hd = {'content-type': 'text/plain',
@@ -60,7 +60,7 @@ for word in words:
             ))
         r_ = requests.post(target_fetch, data=json.dumps(word_data), headers=hd) #取单词详细内容
         text=r_.json()['result']
-        i=1
+        # i=1
         '''subdetailsID(ID,title,examples)->examples(examples,examples_tts)'''
         subdetailsID=dict()
         for subdetails in text['subdetails']:#释义
@@ -68,8 +68,8 @@ for word in words:
                 'title':subdetails['title'],
                 'examples':[],
             }
-            print (str(i)+"."+subdetails['title']+'(ID:{})'.format(subdetails['objectId']))
-            i+=1
+            # print (str(i)+"."+subdetails['title']+'(ID:{})'.format(subdetails['objectId']))
+            # i+=1
         for examples in text['examples']:
             word_tts['tarId']=examples['objectId']
             r_eg = requests.post(target_tts, data=json.dumps(word_tts), headers=hd) #取单词详细内容
@@ -80,5 +80,12 @@ for word in words:
                 subdetailsID[examples['subdetailsId']]['examples'].append(examplesdict)
             except:
                 pass
-        print(json.dumps(subdetailsID))
+        i=1
+        for (Id,val) in subdetailsID.items():
+            print('{i}.(ID:{ID}){title}'.format(i=i,ID=Id,title=val['title']))
+            for examples in val['examples']:
+                for (examples_ID,examples_Val) in examples.items():
+                    print('\t{ID}:\n\t\t{Val0}\n\t\ttts:{Val1}'.format(ID=examples_ID,Val0=examples_Val[0],Val1=examples_Val[1]))
+            i+=1
+
         
