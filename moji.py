@@ -1,0 +1,84 @@
+import requests
+from bs4 import BeautifulSoup as bs4
+import re
+import json
+target_search = 'https://api.mojidict.com/parse/functions/search_v3'
+target_fetch = 'https://api.mojidict.com/parse/functions/fetchWord_v2'
+target_tts = 'https://api.mojidict.com/parse/functions/fetchTts_v2'
+
+
+hd = {'content-type': 'text/plain',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19551'}
+data={#单词列表
+	'searchText':"",
+	"needWords": True,
+	"langEnv": "zh-CN_ja",
+	"_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b",
+	"_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
+	"_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a",
+	"_ClientVersion": "js2.12.0",
+}
+
+word_data={#单词详细数据
+    "wordId": '', 
+    "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b", 
+    "_ApplicationId": "E62VyFVLMiW7kvbtVq3p", 
+    "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
+    "_ClientVersion": "js2.12.0",
+}
+
+word_tts={#这个是例句的
+    "tarId":"",
+    "tarType":103,
+    "_SessionToken":"r:610f6ba0d8d2721e773a2b185b85590b",
+    "_ApplicationId":"E62VyFVLMiW7kvbtVq3p",
+    "_InstallationId":"5562c88b-b67a-c285-b9d1-a8360121380a",
+    "_ClientVersion":"js2.12.0"
+}
+tts_data={#这个是单词的
+    "tarId": '', 
+    "tarType": 102, 
+    "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b", 
+    "_ApplicationId": "E62VyFVLMiW7kvbtVq3p", 
+    "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
+    "_ClientVersion": "js2.12.0"
+}
+data['searchText'] = "一度"
+r = requests.post(target_search, data=json.dumps(data), headers=hd)  # POST请求
+ans = r.json()['result']
+search_result = ans['searchResults']
+words = ans['words']
+
+for word in words:
+    if word['spell']==data['searchText']:
+        word_data["wordId"] = word['objectId']
+        tts_data['tarId']=word['objectId']
+        r_tts = requests.post(target_tts, data=json.dumps(tts_data), headers=hd)#取单词发音
+        tts=r_tts.json()['result']['result']['url']
+        print('===========================\nID:{id}\n{spell}\n{pron} {accent}\n{excerpt}\ntts:{tts}'.format(\
+            id=word['objectId'],spell=word['spell'],pron=word['pron'],accent=word['accent'] ,excerpt=word['excerpt'],tts=tts
+            ))
+        r_ = requests.post(target_fetch, data=json.dumps(word_data), headers=hd) #取单词详细内容
+        text=r_.json()['result']
+        i=1
+        '''subdetailsID(ID,title,examples)->examples(examples,examples_tts)'''
+        subdetailsID=dict()
+        for subdetails in text['subdetails']:#释义
+            subdetailsID[subdetails['objectId']]={
+                'title':subdetails['title'],
+                'examples':[],
+            }
+            print (str(i)+"."+subdetails['title']+'(ID:{})'.format(subdetails['objectId']))
+            i+=1
+        for examples in text['examples']:
+            word_tts['tarId']=examples['objectId']
+            r_eg = requests.post(target_tts, data=json.dumps(word_tts), headers=hd) #取单词详细内容
+            eg_tts=r_eg.json()['result']['result']['url']
+            examplesdict=dict()
+            examplesdict[examples['title']]=(examples['trans'],eg_tts)
+            try:
+                subdetailsID[examples['subdetailsId']]['examples'].append(examplesdict)
+            except:
+                pass
+        print(json.dumps(subdetailsID))
+        
