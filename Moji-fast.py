@@ -62,23 +62,37 @@ class Moji(WebService):#接口名称
         ans = r.json()['result']
         # wirte_word(ans,self.word)
         return self.cache_this(ans)
-    # @with_styles(css='_moji.css', need_wrap_css=True, wrap_class='word-detail')
-    # def _css(self, val):
-    #     return val
+    @with_styles(cssfile="_moji.css", need_wrap_css=False,wrap_class='mojidict-helper-card-container')
+    def _css(self, val):
+        # 如果是 css="@import 'moji.css'"
+        # # if os.path.exists('moji.css')==False:
+        # #     from aqt.winpaths import get_appdata
+        #     css_path=os.path.join(get_appdata(), "Anki2","addons21",'1807206748','service','static','_moji.css')#获取Anki的Fast插件位置
+        #     import shutil
+        #     try:
+        #         shutil.copy(css_path,'_moji.css')
+        #     except:
+        #         pass
+        return val
     @export('单词释义[简]')
     def mean_simple(self):
         words=self._get_field('words')
-        ret=''
+        ret='''<div class="mojidict-helper-card"><div class="word-detail-container">'''
         for word in words:
-            if word['spell']==self.word:
-                '''<span class="detail-title" title="{0}">{0}</span>
-                    <p title="{1}">1. 一回，一次，一遍。{1}</p>'''
-                w=u'''<span class="detail-title" title="{pron}">{pron}</span>
-                    <p title="{excerpt}">1. 一回，一次，一遍。{excerpt}</p>'''.format(pron=word['pron'],excerpt=word['excerpt'])
-                w=u'{pron}:<br>{excerpt}<br>'.format(pron=word['pron'],excerpt=word['excerpt'])
+            if word['spell']==self.word or word['pron']==self.word:
+                word_Part_of_speech='['+''.join(re.findall(r'\[(.*?)\]',word['excerpt']))+']<br>'#词性
+                word_val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()#分割
+                word_text=''
+                for text in word_val:
+                    word_text+=text+'<br>'
+                word_text.rstrip('<br>')#去除末尾换行符
+                word_text= word_Part_of_speech+word_text #词性+释义
+                w='''<div class="word-detail"><span class="detail-title">{pron}</span><p>{excerpt}</p></div>'''.format(pron=word['pron'],excerpt=word_text)
+                # w=u'{pron}:<br>{excerpt}<br>'.format(pron=word['pron'],excerpt=word['excerpt'])
                 ret+=w
-        # return self._css(ret)
-        return ret
+        ret=ret+'</div></div>'
+        return self._css(ret)
+        # return ret
     @export('单词发音')
     def mean_audio(self):
         words=self._get_field('words')
