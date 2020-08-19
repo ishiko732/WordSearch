@@ -43,14 +43,14 @@ tts_data={#这个是单词的
     "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
     "_ClientVersion": "js2.12.0"
 }
-data['searchText'] = "一度"
+data['searchText'] = "ひとたび"
 r = requests.post(target_search, data=json.dumps(data), headers=hd)  # POST请求
 ans = r.json()['result']
 # search_result = ans['searchResults']
 words = ans['words']
 
 for word in words:
-    if word['spell']==data['searchText']:
+    if word['spell']==data['searchText']or word['pron']==data['searchText']:
         word_data["wordId"] = word['objectId']
         tts_data['tarId']=word['objectId']
         r_tts = requests.post(target_tts, data=json.dumps(tts_data), headers=hd)#取单词发音
@@ -58,6 +58,11 @@ for word in words:
         print('===========================\nID:{id}\n{spell}\n{pron} {accent}\n{excerpt}\ntts:{tts}'.format(\
             id=word['objectId'],spell=word['spell'],pron=word['pron'],accent=word['accent'] ,excerpt=word['excerpt'],tts=tts
             ))
+        # str_=''.join(re.findall(r'\[(.*?)\]',word['excerpt'])).split('・')
+        # val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()
+        # print(str_,val)
+        # exit(0)
+        #暂时停止测试
         r_ = requests.post(target_fetch, data=json.dumps(word_data), headers=hd) #取单词详细内容
         text=r_.json()['result']
         # i=1
@@ -72,11 +77,11 @@ for word in words:
             # i+=1
         for examples in text['examples']:
             word_tts['tarId']=examples['objectId']
-            r_eg = requests.post(target_tts, data=json.dumps(word_tts), headers=hd) #取单词详细内容
-            eg_tts=r_eg.json()['result']['result']['url']
-            examplesdict=dict()
-            examplesdict[examples['title']]=(examples['trans'],eg_tts)
             try:
+                r_eg = requests.post(target_tts, data=json.dumps(word_tts), headers=hd) #取单词详细内容
+                eg_tts=r_eg.json()['result']['result']['url']
+                examplesdict=dict()
+                examplesdict[examples['title']]=(examples['trans'],eg_tts)
                 subdetailsID[examples['subdetailsId']]['examples'].append(examplesdict)
             except:
                 pass
