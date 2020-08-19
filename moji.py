@@ -60,7 +60,19 @@ for word in words:
             ))
         # str_=''.join(re.findall(r'\[(.*?)\]',word['excerpt'])).split('・')
         # val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()
-        # print(str_,val)
+        # ret=''
+        # for text in val:
+        #     ret+=text+'<br>'
+        # str_='['.join(re.findall(r'\[(.*?)\]',word['excerpt']))+']<br>'
+        # print(str_,ret.rstrip('<br>'))
+        # word_Part_of_speech='['+''.join(re.findall(r'\[(.*?)\]',word['excerpt']))+']<br>'
+        # word_val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()
+        # ret=''
+        # for text in word_val:
+        #     ret+=text+'<br>'
+        # ret.rstrip('<br>')
+        # ret= word_Part_of_speech+ret
+        # print(ret)
         # exit(0)
         #暂时停止测试
         r_ = requests.post(target_fetch, data=json.dumps(word_data), headers=hd) #取单词详细内容
