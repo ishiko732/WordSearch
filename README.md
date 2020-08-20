@@ -2,7 +2,9 @@
 
 ------
 
-## Weblio.py
+## Service
+
+### Weblio.py
 
 对Weblio词典app端口（amp接口）进行解析单词的含义
 
@@ -12,7 +14,7 @@
 - 完整释义
 - 相似单词
 
-## Weblio-English.py
+### Weblio-English.py
 
 对Weblio英日词典进行解析单词的含义
 
@@ -24,7 +26,7 @@
 - 英语派生词
 - 主要意思
 
-## Jisho.py
+### Jisho.py
 
 对Jisho英日词典进行解析单词的含义
 
@@ -37,7 +39,7 @@
 - 词性
 - 日语相似单词
 
-## Moji.py
+### Moji.py
 
 对Moji词典进行解析单词的含义
 
@@ -67,3 +69,8 @@
     - _moji.css
 
   
+
+------
+
+[添加词库.md](https://github.com/GDOU-LYF/WordSearch/blob/master/添加词库.md)
+
