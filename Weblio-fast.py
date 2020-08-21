@@ -6,6 +6,9 @@ import json
 from ..base import *
 
 def WeblioSearch(word):
+    NetDict=dict()
+    NetDict['word']=list()
+    NetDict['SsdSml']=list()
     try:
         url=u'https://www.weblio.jp/content/amp/{word}'.format(word=word)
         get_requests=requests.get(url,timeout=5)#设置超时
@@ -17,19 +20,17 @@ def WeblioSearch(word):
                 flag=True
         if flag==False:
             print("見つからない")
-            return ''
-            # import sys
-            # sys.exit(0)
+            import sys
+            sys.exit(0)
     except:#修正502 bad网页状态
         print("見つからない")
-        return ''
+        return NetDict
 
     #三省堂 大辞林 第三版
     key=soup.find_all('div',attrs={'class':'NetDicHead'})#包含假名,音标,汉字
     val=soup.find_all('div',attrs={'class':'NetDicBody'})#包含单词解释
 
     Head_all=re.findall(r'<h3 .*?>(.*?)</h3>',str(key))
-    NetDict=dict()
     i=0
     for x in Head_all:
         kana=''.join(re.findall(r'<b>(.*?)</b>',x)).replace(' ','')
@@ -37,26 +38,21 @@ def WeblioSearch(word):
         if len(kana_add)!=0:
             kana=kana+'－'+''.join(kana_add).replace(' ','')
         pt=''.join(re.findall(r'<span>［(.*?)］</span>',x)).replace(' ','')
-        NetDict['count']=NetDict.get('count',0)+1
-        NetDict['word_'+str(NetDict.get('count',0))]={
+        dict_word={
             'kana':kana,
             'pt':pt,
-            'mean':val[i].text.replace('  ','\n'),
+            'mean':val[i].text.replace('  ','\n').strip('\n'),
         }
+        NetDict['word'].append(dict_word)
         i+=1
     #判断是否有相似单词
     SsdSml=soup.find_all('div',attrs={'class':'SsdSmlCt'})
     SsdSml_all=re.findall(r'<a href="(.*?)" title=".*?">(.*?)</a>',str(SsdSml))
-    Ssd=dict()
     for (html,name) in SsdSml_all:
+        Ssd=dict()
         Ssd[name]=html
-    if len(Ssd):#判断是否有相似单词
-        NetDict['SsdSml']=Ssd
-
-    #json
-    jsObj = json.dumps(NetDict)
-    #json
-    return json.loads(jsObj)
+        NetDict['SsdSml'].append(Ssd)
+    return NetDict
     #三省堂 大辞林 第三版
 
 @register([u'Weblio-ja', u'Weblio-ja'])
@@ -64,53 +60,49 @@ class Weblio(WebService):
     def __init__(self):
         super(Weblio, self).__init__()
     def _get_from_api(self):
-        fileword=WeblioSearch(self.word)
-        if fileword==dict():
-            result={
-                'kana_all':u'',
-                'kana_first':u'',
-                'SsdSml':u'',
-            }
-            return self.cache_this(result)
-        # with open(filewordpath, 'r') as f:
-        #     fileword= json.loads(f.read())
-        for kana in fileword.keys():
-            if kana=='SsdSml':
-                SsdSml=json.dumps(fileword['SsdSml'])
-                SsdSml=json.loads(SsdSml)
-        SsdSml_str=''
-        for (name,html) in SsdSml.items():
-            SsdSml_str=SsdSml_str+u'<a href="{url}" one-link-mark="yes">{word}</a>&thinsp;&thinsp;'.format(\
-                url=html,word=name)
-        kana_all=''
-        kana_first=''
-        for i in range(1,fileword['count']+1):
-            kana_word=json.dumps(fileword['word_'+str(i)])
-            kana_word=json.loads(kana_word)
-            fm="<b>{kana}</b>&thinsp;&thinsp;{pt}<br>{mean}".format(\
-                    kana=kana_word['kana'],\
-                        pt=kana_word['pt'],\
-                            mean=kana_word['mean'].replace(u'\n','<br>')) 
-            if kana_first=='':
-                kana_all=kana_first= fm
-            else:
-                kana_all=kana_all+u'<br><br>'+fm
-
-        result={
-            'kana_all':kana_all,
-            'kana_first':kana_first,
-            'SsdSml':SsdSml_str,
-        }
+        result=WeblioSearch(self.word)
         return self.cache_this(result)
     
     @export('释义')
     def mean_(self):
-        return self._get_field('kana_first')
+        fileword_Words=self._get_field('word')
+        ret=u''
+        for (key,value) in fileword_Words[0].items():
+            if key!='mean':
+                ret=ret+u"{}  ".format(value)
+            else:
+                ret=ret.strip('  ')+u"<br>{}".format(value)
+        return ret.strip()
 
     @export('完整释义')
     def mean_all(self):
-        return self._get_field('kana_all')
+        fileword_Words=self._get_field('word')
+        ret=u''
+        for words in fileword_Words:
+            for (key,value) in words.items():
+                if key!='mean':
+                    ret=ret+u"{}  ".format(value)
+                else:
+                    ret=ret.strip('  ')+u"<br>{}".format(value)
+            ret+='<br>'
+        return ret.strip('<br>')
 
     @export('相似意思')
     def SsdSml_(self):
-        return self._get_field('SsdSml')
+        fileword_SsdSml=self._get_field('SsdSml')
+        SsdSml_str=u''
+        for SsdSml in fileword_SsdSml:
+            for (key,value) in SsdSml.items():
+                SsdSml_str=SsdSml_str+u'<a href="{url}" one-link-mark="yes">{word}</a>&thinsp;&thinsp;'.format(\
+                    url=value,word=key)
+        return SsdSml_str
+    
+    @export('假名')
+    def okurigana(self):
+        fileword_Words=self._get_field('word')
+        okurigana=''
+        for words in fileword_Words:
+            for (key,value) in words.items():
+                if key=='kana':
+                    okurigana+=value+u'/'
+        return okurigana.rstrip('/')
