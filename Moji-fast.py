@@ -11,6 +11,18 @@ def wirte_word(worddict,word):#测试代码,写入
     fileObject = open(_file, 'w')
     fileObject.write(fileword)
     fileObject.close()
+def Word_t(word):
+    ret=''
+    word_Part_of_speech='['+''.join(re.findall(r'\[(.*?)\]',word['excerpt']))+']<br>'#词性
+    word_val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()#分割
+    ret+='''<div class="word-detail"><span class="detail-title">{pron}</span>{word_Part_of_speech}'''.format(pron=word['pron'],word_Part_of_speech=word_Part_of_speech)
+    i=1
+    word_text=''
+    for text in word_val:
+        word_text+='<p>{i_count}.{excerpt}</p>'.format(i_count=i,excerpt=text)
+    ret+=word_text+'</div>'
+    return ret
+
 
 @register([u'Moji', u'Moji'])#接口名称
 class Moji(WebService):#接口名称
@@ -78,21 +90,18 @@ class Moji(WebService):#接口名称
     def mean_simple(self):
         words=self._get_field('words')
         ret='''<div class="mojidict-helper-card"><div class="word-detail-container">'''
+        count=0
         for word in words:
             if word['spell']==self.word or word['pron']==self.word:
-                word_Part_of_speech='['+''.join(re.findall(r'\[(.*?)\]',word['excerpt']))+']<br>'#词性
-                word_val=re.sub(r"\[(.*?)\]", "",word['excerpt']).split()#分割
-                word_text=''
-                for text in word_val:
-                    word_text+=text+'<br>'
-                word_text.rstrip('<br>')#去除末尾换行符
-                word_text= word_Part_of_speech+word_text #词性+释义
-                w='''<div class="word-detail"><span class="detail-title">{pron}</span><p>{excerpt}</p></div>'''.format(pron=word['pron'],excerpt=word_text)
-                # w=u'{pron}:<br>{excerpt}<br>'.format(pron=word['pron'],excerpt=word['excerpt'])
-                ret+=w
+                count+=1
+                ret+=Word_t(word)
+        if count==0:
+            temp=ret+Word_t(words[0])+'</div></div>'
         ret=ret+'</div></div>'
+        if count==0:
+            return self._css(temp)
         return self._css(ret)
-        # return ret
+
     @export('单词发音')
     def mean_audio(self):
         words=self._get_field('words')
