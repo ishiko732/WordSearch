@@ -10,10 +10,10 @@
   color: black;
   border-radius: 10px;
 
-  width: 300px;
+  width: 600px;
   min-width: 150px;
-  max-height: 350px;
-  overflow-y: auto;
+  /* max-height: 350px; */
+  /* overflow-y: auto; */
   /* position: absolute; */
   z-index: 999999999;
 

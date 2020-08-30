@@ -169,25 +169,28 @@ for wID in moji_word.wordID:
     ret+=mean_all+'</div>'
 ret+='</div>'*2
 print(ret,'\n===========================\n')
-# print('\n===========================\n单词TTS')
-# for wID in moji_word.wordID:
-#     url=moji_word.Get_TTS(wID)
-#     print(url)
-# print('\n===========================\n')
-# print('\n===========================\n单词完整释义[主]')
-# for wID in moji_word.wordID:
-#     word=moji_word.Get_Word(wID)
-#     print(word)
+print('\n===========================\n单词TTS')
+for wID in moji_word.wordID:
+    url=moji_word.Get_TTS(wID)
+    print(url)
+print('\n===========================\n')
+print('\n===========================\n单词完整释义[主]')
+for wID in moji_word.wordID:
+    word=moji_word.Get_Word(wID)
+    # print(word)
     # for word_ in word.values():
     #     print(word_)
-    # for mean in 
-#     ret+='''<div class="word-detail"><span class="detail-title">{pron}</span>{word_Part_of_speech}'''.format(pron=word['pron'],word_Part_of_speech=word['word_Part_of_speech'])
-#     i=1
-#     mean_all=''
-#     for mean in word['word_val']:
-#         mean_all+='<p>{i_count}.{excerpt}</p>'.format(i_count=i,excerpt=mean)
-#         i+=1
-#     ret+=mean_all+'</div>'
-# ret+='</div>'*2
+    ret_word=moji_word.mean_simple(wID)
+    ret+='''<div class="word-detail"><span class="detail-title">\
+        {pron}</span>{word_Part_of_speech}'''.\
+            format(pron=ret_word['pron'],\
+                word_Part_of_speech=ret_word['word_Part_of_speech'])
+    i=1
+    mean_all=''
+    for mean in ret_word['word_val']:
+        mean_all+='<p>{i_count}.{excerpt}</p>'.format(i_count=i,excerpt=mean)
+        i+=1
+    ret+=mean_all+'</div>'
+ret+='</div>'*2
 print(moji_word.Get_URL() )
 
