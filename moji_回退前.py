@@ -16,9 +16,7 @@ class Moji(object):
     tts_data={#这个是单词的,102单词,103例句
         "tarId": '', 
         "tarType": 102, 
-        "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b", 
-        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p", 
-        "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
+        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
         "_ClientVersion": "js2.12.0"
     }
     
@@ -27,18 +25,14 @@ class Moji(object):
         'searchText':"",
         "needWords": True,
         "langEnv": "zh-CN_ja",
-        "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b",
         "_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
-        "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a",
         "_ClientVersion": "js2.12.0",
     }
 
     target_fetch = 'https://api.mojidict.com/parse/functions/fetchWord_v2'#查询单词详细内容
     word_data={#单词详细数据
     "wordId":"",
-    "_SessionToken":"r:610f6ba0d8d2721e773a2b185b85590b",
     "_ApplicationId":"E62VyFVLMiW7kvbtVq3p",
-    "_InstallationId":"5562c88b-b67a-c285-b9d1-a8360121380a",
     "_ClientVersion":"js2.12.0"
     }
     def Post_Word(self):
