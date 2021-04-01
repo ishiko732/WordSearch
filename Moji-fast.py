@@ -36,34 +36,26 @@ class Moji(WebService):#接口名称
         'searchText':"",
         "needWords": True,
         "langEnv": "zh-CN_ja",
-        "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b",
         "_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
-        "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a",
         "_ClientVersion": "js2.12.0",
     }
 
     word_data={#单词详细数据
         "wordId": '', 
-        "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b", 
-        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p", 
-        "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
+        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
         "_ClientVersion": "js2.12.0",
     }
 
     word_tts={#这个是例句的
         "tarId":"",
         "tarType":103,
-        "_SessionToken":"r:610f6ba0d8d2721e773a2b185b85590b",
         "_ApplicationId":"E62VyFVLMiW7kvbtVq3p",
-        "_InstallationId":"5562c88b-b67a-c285-b9d1-a8360121380a",
         "_ClientVersion":"js2.12.0"
     }
     tts_data={#这个是单词的
         "tarId": '', 
         "tarType": 102, 
-        "_SessionToken": "r:610f6ba0d8d2721e773a2b185b85590b", 
-        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p", 
-        "_InstallationId": "5562c88b-b67a-c285-b9d1-a8360121380a", 
+        "_ApplicationId": "E62VyFVLMiW7kvbtVq3p",
         "_ClientVersion": "js2.12.0"
     }
     def __init__(self):
